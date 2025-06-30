@@ -64,7 +64,7 @@ namespace RedSismicaWinForms
 
         public void tomarRegistroResultadoRevisionManual()
         {
-            // Inicializa variables de control del caso de uso
+            // Inicializa variables de control del caso de usoo
             eventoSeleccionado = null;
 
             eventosSismicosAutoDetectados = obtenerEventosSismicosAutoDetectados();
