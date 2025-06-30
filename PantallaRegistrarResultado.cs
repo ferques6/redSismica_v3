@@ -1,4 +1,4 @@
-using System;
+Ôªøusing System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
@@ -7,191 +7,236 @@ namespace RedSismicaWinForms
 {
     public partial class PantRegistrarResultado : Form
     {
-        private GestorRegistrarResultado gestor;
         private List<EventoSismico> eventos;
+        private GestorRegistrarResultado gestor;
         private EventoSismico eventoSeleccionado;
 
         // Controles visuales
-        private ListBox listBoxEventos;
-        private Button btnSeleccionar;
+        private Panel panelHeader;
+        private Label lblTitulo;
+        private Label lblSubEventos, lblDetalles, lblSeries, lblAccion, lblMensaje;
+        private ListBox listBoxEventos, listBoxSeries;
+        private Button btnSeleccionar, btnRegistrar, btnVisualizarMapa;
         private TextBox txtDetalles;
-        private ListBox listBoxSeries;
         private ComboBox comboAccion;
-        private Button btnRegistrar;
-        private Label lblTitulo, lblSubEventos, lblDetalles, lblAccion, lblSeries, lblMensaje;
+
 
         public PantRegistrarResultado(GestorRegistrarResultado gestor)
         {
             this.gestor = gestor;
             InicializarControles();
-            seleccionarRegistroResultadoRevisionManual(); // Llamo al flujo principal de la pantalla
+            seleccionarRegistroResultadoRevisionManual();
+            this.Resize += PantRegistrarResultado_Resize;
         }
 
         private void InicializarControles()
         {
-            this.Text = "Registro de revisiÛn manual de eventos sÌsmicos";
-            this.MinimumSize = new Size(1000, 550); // TamaÒo mÌnimo recomendado
-            this.Size = new Size(1000, 550);
-            this.BackColor = Color.WhiteSmoke;
+            // Ventana
+            this.Text = "Revisi√≥n manual de eventos s√≠smicos";
+            this.MinimumSize = new Size(1100, 680);
+            this.Size = new Size(1200, 750);
+            this.BackColor = Color.FromArgb(248, 250, 255);
 
-            Font fuenteTitulo = new Font("Segoe UI", 16, FontStyle.Bold);
-            Font fuenteNormal = new Font("Segoe UI", 11);
-
-            // TÌtulo principal
-            lblTitulo = new Label()
+            // Header superior
+            panelHeader = new Panel
             {
-                Text = "Registrar resultado de revisiÛn manual",
-                Font = fuenteTitulo,
-                Left = 20,
-                Top = 10,
-                Width = 700,
-                ForeColor = Color.DarkSlateBlue,
+                Left = 0,
+                Top = 0,
+                Width = this.Width,
+                Height = 65,
+                BackColor = Color.FromArgb(44, 62, 80),
                 Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
             };
+            this.Controls.Add(panelHeader);
 
-            // SubtÌtulo eventos
-            lblSubEventos = new Label()
+            lblTitulo = new Label
             {
-                Text = "Eventos sÌsmicos auto detectados",
-                Font = fuenteNormal,
-                Left = 20,
-                Top = 60,
-                Width = 350,
-                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
-            };
-
-            listBoxEventos = new ListBox()
-            {
-                Left = 20,
-                Top = 90,
-                Width = 370,
-                Height = 140,
-                Font = fuenteNormal,
-                BackColor = Color.White,
-                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
-            };
-
-            btnSeleccionar = new Button()
-            {
-                Left = 410,
-                Top = 90,
-                Width = 140,
-                Height = 38,
-                Text = "Seleccionar",
-                Font = fuenteNormal,
-                BackColor = Color.FromArgb(100, 149, 237),
+                Text = "üü¶ Registro de revisi√≥n manual de eventos s√≠smicos",
+                Font = new Font("Segoe UI", 22, FontStyle.Bold),
                 ForeColor = Color.White,
-                Anchor = AnchorStyles.Top | AnchorStyles.Right
+                BackColor = Color.Transparent,
+                Left = 36,
+                Top = 13,
+                AutoSize = true
             };
-            btnSeleccionar.FlatStyle = FlatStyle.Flat;
+            panelHeader.Controls.Add(lblTitulo);
+
+            // Subt√≠tulo lista eventos
+            lblSubEventos = new Label
+            {
+                Text = "Eventos s√≠smicos auto detectados",
+                Font = new Font("Segoe UI", 12, FontStyle.Bold),
+                ForeColor = Color.FromArgb(44, 62, 80),
+                BackColor = Color.Transparent,
+                Left = 42,
+                Top = 82,
+                Width = 510
+            };
+            // ListBox eventos (m√°s ancho y alto)
+            listBoxEventos = new ListBox
+            {
+                Left = 40,
+                Top = 115,
+                Width = 700,
+                Height = 240,
+                Font = new Font("Segoe UI", 11),
+                BackColor = Color.White,
+                ForeColor = Color.FromArgb(52, 73, 94),
+                BorderStyle = BorderStyle.FixedSingle,
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom
+            };
+            listBoxEventos.HorizontalScrollbar = true;
+
+            // Bot√≥n seleccionar evento
+            btnSeleccionar = new Button
+            {
+                Text = "Seleccionar evento",
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                Left = 40,
+                Top = 370,
+                Width = 510,
+                Height = 40,
+                BackColor = Color.FromArgb(52, 152, 219),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Anchor = AnchorStyles.Left | AnchorStyles.Top
+            };
             btnSeleccionar.FlatAppearance.BorderSize = 0;
             btnSeleccionar.Cursor = Cursors.Hand;
             btnSeleccionar.Click += btnSeleccionar_Click;
 
-            // Detalles del evento
-            lblDetalles = new Label()
+            // Bot√≥n visualizar mapa (debajo de seleccionar)
+            btnVisualizarMapa = new Button
             {
-                Text = "Detalle del evento seleccionado",
-                Font = fuenteNormal,
-                Left = 20,
-                Top = 240,
-                Width = 400,
-                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
+                Text = "Mapa",
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                Left = 40,
+                Top = 420,
+                Width = 510,
+                Height = 40,
+                BackColor = Color.FromArgb(41, 128, 185),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Anchor = AnchorStyles.Left | AnchorStyles.Top
+            };
+            btnVisualizarMapa.FlatAppearance.BorderSize = 0;
+            btnVisualizarMapa.Cursor = Cursors.Hand;
+            btnVisualizarMapa.Click += btnSeleccionar_Mapa;
+
+            // Subt√≠tulo detalles
+            lblDetalles = new Label
+            {
+                Text = "Detalle del evento",
+                Font = new Font("Segoe UI", 12, FontStyle.Bold),
+                ForeColor = Color.FromArgb(44, 62, 80),
+                BackColor = Color.Transparent,
+                Left = 40,
+                Top = 475,
+                Width = 510
             };
 
-            txtDetalles = new TextBox()
+            // TextBox detalles (m√°s ancho)
+            txtDetalles = new TextBox
             {
-                Left = 20,
-                Top = 270,
-                Width = 530,
-                Height = 90,
+                Left = 40,
+                Top = 505,
+                Width = 510,
+                Height = 100,
+                Font = new Font("Segoe UI", 10),
+                BackColor = Color.FromArgb(240, 243, 249),
+                ForeColor = Color.FromArgb(33, 37, 41),
                 Multiline = true,
                 ReadOnly = true,
-                Font = fuenteNormal,
-                BackColor = Color.Gainsboro,
-                ScrollBars = ScrollBars.Vertical,
-                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
+                BorderStyle = BorderStyle.FixedSingle,
+                ScrollBars = ScrollBars.Vertical
             };
 
-            // Series temporales
-            lblSeries = new Label()
+            // Subt√≠tulo series (m√°s a la derecha)
+            lblSeries = new Label
             {
                 Text = "Series temporales asociadas",
-                Font = fuenteNormal,
-                Left = 570,
-                Top = 60,
-                Width = 260,
-                Anchor = AnchorStyles.Top | AnchorStyles.Right
+                Font = new Font("Segoe UI", 12, FontStyle.Bold),
+                ForeColor = Color.FromArgb(44, 62, 80),
+                BackColor = Color.Transparent,
+                Left = 580,
+                Top = 82,
+                Width = 240
             };
 
-            listBoxSeries = new ListBox()
+            // ListBox series (m√°s angosto)
+            listBoxSeries = new ListBox
             {
-                Left = 570,
-                Top = 90,
-                Width = 320,
-                Height = 270,
-                Font = fuenteNormal,
+                Left = 580,
+                Top = 115,
+                Width = 250,
+                Height = 250,
+                Font = new Font("Segoe UI", 11),
                 BackColor = Color.White,
-                Anchor = AnchorStyles.Top | AnchorStyles.Right | AnchorStyles.Bottom
+                ForeColor = Color.FromArgb(52, 73, 94),
+                BorderStyle = BorderStyle.FixedSingle,
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom
             };
 
-            // AcciÛn
-            lblAccion = new Label()
+            // Subt√≠tulo acci√≥n
+            lblAccion = new Label
             {
-                Text = "AcciÛn a realizar sobre el evento:",
-                Font = fuenteNormal,
-                Left = 20,
-                Top = 375,
+                Text = "Acci√≥n sobre el evento:",
+                Font = new Font("Segoe UI", 12, FontStyle.Bold),
+                ForeColor = Color.FromArgb(44, 62, 80),
+                BackColor = Color.Transparent,
+                Left = 40,
+                Top = 630,
+                Width = 250
+            };
+
+            // Combo acci√≥n
+            comboAccion = new ComboBox
+            {
+                Left = 40,
+                Top = 660,
                 Width = 260,
-                Anchor = AnchorStyles.Left | AnchorStyles.Bottom
+                Font = new Font("Segoe UI", 11),
+                DropDownStyle = ComboBoxStyle.DropDownList
             };
-
-            comboAccion = new ComboBox()
-            {
-                Left = 20,
-                Top = 400,
-                Width = 230,
-                Font = fuenteNormal,
-                DropDownStyle = ComboBoxStyle.DropDownList,
-                Anchor = AnchorStyles.Left | AnchorStyles.Bottom
-            };
-            comboAccion.Items.AddRange(new string[] { "Confirmar", "Rechazar", "Solicitar revisiÛn a experto" });
+            comboAccion.Items.AddRange(new string[] { "Confirmar", "Rechazar", "Solicitar revisi√≥n a experto" });
             comboAccion.SelectedIndex = 0;
 
-            btnRegistrar = new Button()
+            // Bot√≥n registrar
+            btnRegistrar = new Button
             {
-                Left = 270,
-                Top = 400,
-                Width = 170,
-                Height = 38,
                 Text = "Registrar resultado",
-                Font = fuenteNormal,
-                BackColor = Color.MediumSeaGreen,
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                Left = 320,
+                Top = 570,
+                Width = 200,
+                Height = 40,
+                BackColor = Color.FromArgb(39, 174, 96),
                 ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
                 Anchor = AnchorStyles.Left | AnchorStyles.Bottom
             };
-            btnRegistrar.FlatStyle = FlatStyle.Flat;
             btnRegistrar.FlatAppearance.BorderSize = 0;
             btnRegistrar.Cursor = Cursors.Hand;
             btnRegistrar.Click += btnRegistrar_Click;
 
-            // Mensaje de feedback
-            lblMensaje = new Label()
+            // Label mensaje
+            lblMensaje = new Label
             {
-                Left = 20,
-                Top = 450,
-                Width = 880,
-                Height = 28,
-                Font = fuenteNormal,
-                ForeColor = Color.DarkGreen,
-                Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom
+                Left = 580,
+                Top = 630,
+                Width = 420,
+                Height = 60,
+                Font = new Font("Segoe UI", 11, FontStyle.Italic),
+                ForeColor = Color.FromArgb(39, 174, 96),
+                Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom,
+                BackColor = Color.Transparent
             };
 
-            // Agrego los controles al formulario
-            this.Controls.Add(lblTitulo);
+            // Agrego todos los controles
             this.Controls.Add(lblSubEventos);
             this.Controls.Add(listBoxEventos);
             this.Controls.Add(btnSeleccionar);
+            this.Controls.Add(btnVisualizarMapa);
             this.Controls.Add(lblDetalles);
             this.Controls.Add(txtDetalles);
             this.Controls.Add(lblSeries);
@@ -202,124 +247,134 @@ namespace RedSismicaWinForms
             this.Controls.Add(lblMensaje);
         }
 
-        // ...El resto de los mÈtodos de tu clase quedan igual...
-        // === MÈtodos requeridos por el diagrama de clases/secuencia ===
-
-        public void habilitarVentana()
+        // L√≥gica responsive: ajusta controles al redimensionar
+        private void PantRegistrarResultado_Resize(object sender, EventArgs e)
         {
-            this.Enabled = true;
+            int margenIzq = 40, espacioCol = 30;
+            int anchoVentana = this.ClientSize.Width;
+            int altoVentana = this.ClientSize.Height;
+            int alturaHeader = panelHeader.Height;
+
+            // Columna izquierda
+            listBoxEventos.Width = 800;
+            btnSeleccionar.Width = 510;
+            btnVisualizarMapa.Width = 510;
+            txtDetalles.Width = 510;
+            lblDetalles.Width = 400;
+
+            btnSeleccionar.Top = listBoxEventos.Bottom + 15;
+            btnVisualizarMapa.Top = btnSeleccionar.Bottom + 10;
+            lblDetalles.Top = btnVisualizarMapa.Bottom + 15;
+            txtDetalles.Top = lblDetalles.Bottom + 5;
+
+            lblAccion.Top = altoVentana - 90;
+            comboAccion.Top = lblAccion.Bottom + 4;
+            btnRegistrar.Top = comboAccion.Top;
+
+            // Columna derecha (series)
+            int colDerLeft = margenIzq + listBoxEventos.Width + espacioCol;
+            listBoxSeries.Left = lblSeries.Left = lblMensaje.Left = colDerLeft;
+            listBoxSeries.Width = anchoVentana - colDerLeft - margenIzq;
+            listBoxSeries.Height = altoVentana - 160;
+            lblSeries.Top = 82;
+
+            // Feedback
+            lblMensaje.Top = altoVentana - 90;
+            lblMensaje.Width = listBoxSeries.Width;
         }
+
+        // M√©todos funcionales requeridos
+        public void seleccionarRegistroResultadoRevisionManual()
+        {
+            habilitarVentana();
+            eventos = gestor.tomarRegistroResultadoRevisionManual();
+            mostrarEventosOrdenados(eventos);
+            txtDetalles.Text = "";
+            listBoxSeries.Items.Clear();
+            lblMensaje.Text = "";
+        }
+        public void habilitarVentana() => this.Enabled = true;
 
         public void mostrarEventosOrdenados(List<EventoSismico> eventos)
         {
             listBoxEventos.Items.Clear();
             foreach (var ev in eventos)
-                listBoxEventos.Items.Add(ev.getResumenEvento());
+                listBoxEventos.Items.Add(gestor.buscarDatosEventoSismico(ev));
         }
 
-        public int pedirSeleccionEvento()
-        {
-            return listBoxEventos.SelectedIndex;
-        }
-
-        public void mostrarDatosSismicos(EventoSismico evento)
-        {
-            txtDetalles.Text = evento.getDatosEventoSismico();
-
-            listBoxSeries.Items.Clear();
-            foreach (var st in evento.getSerieTemporal())
-            {
-                listBoxSeries.Items.Add(
-                    $"EstaciÛn: {st.obtenerCodigoEstacion()} | SismÛgrafo: {st.obtenerNombreSismografo()}"
-                );
-            }
-        }
-
-        public void mostrarOpcionModificarDatosEvSismico()
-        {
-            MessageBox.Show("øDesea modificar los datos del evento sÌsmico?", "Modificar datos", MessageBoxButtons.YesNo);
-        }
-
-        public string pedirAccionConEvento()
-        {
-            return comboAccion.SelectedItem?.ToString();
-        }
-
-        public void tomarAccionConEvento()
-        {
-            string accion = pedirAccionConEvento();
-            gestor.tomarAccionConEvento(accion);
-            lblMensaje.Text = "Evento actualizado correctamente.";
-            lblMensaje.ForeColor = Color.DarkGreen;
-            CargarEventos();
-            comboAccion.SelectedIndex = 0;
-            eventoSeleccionado = null;
-        }
-
-        public void tomarOpcionModificarDatosEvSismico()
-        {
-            MessageBox.Show("Funcionalidad de modificar datos pendiente de implementaciÛn.", "Info");
-        }
-
-        public void tomarOpcionVisualizarSismografo()
-        {
-            if (eventoSeleccionado == null)
-            {
-                MessageBox.Show("Seleccion· un evento primero.", "Advertencia");
-                return;
-            }
-            var series = eventoSeleccionado.getSerieTemporal();
-            string msg = "";
-            foreach (var st in series)
-            {
-                msg += $"EstaciÛn: {st.obtenerCodigoEstacion()} - SismÛgrafo: {st.obtenerNombreSismografo()}\n";
-            }
-            MessageBox.Show(msg, "SismÛgrafos del evento seleccionado");
-        }
+        public int pedirSeleccionEvento() => listBoxEventos.SelectedIndex;
 
         public void tomarSeleccionEvento()
         {
             int indice = pedirSeleccionEvento();
             if (indice < 0)
             {
-                lblMensaje.Text = "Seleccion· un evento sÌsmico para ver detalles.";
-                lblMensaje.ForeColor = Color.IndianRed;
+                lblMensaje.Text = "Seleccion√° un evento para ver detalles.";
+                lblMensaje.ForeColor = Color.FromArgb(192, 57, 43);
                 return;
             }
-            eventoSeleccionado = eventos[indice];
-            gestor.tomarSeleccionEvento(eventoSeleccionado);
-            mostrarDatosSismicos(eventoSeleccionado);
+            gestor.tomarSeleccionEvento(eventos[indice]); // si tu gestor lo necesita, sino por √≠ndice
+            mostrarDatosSismicos(indice);
             lblMensaje.Text = "";
         }
 
-        public void seleccionarRegistroResultadoRevisionManual()
+        public void mostrarDatosSismicos(int indice)
         {
-            this.habilitarVentana();
-            eventos = gestor.obtenerEventosSismicosAutoDetectados();
-            mostrarEventosOrdenados(eventos);
+            txtDetalles.Text = gestor.buscarDatosEventoSismico(indice);
+            listBoxSeries.Items.Clear();
+            foreach (var serie in gestor.buscarSeriesTemporales(indice))
+                listBoxSeries.Items.Add(serie);
         }
 
-        private void btnSeleccionar_Click(object sender, EventArgs e)
+        public void mostrarOpcionVisualizarMapa()
         {
-            tomarSeleccionEvento();
+            var resultado = MessageBox.Show(
+                "¬øDese√°s visualizar el mapa del evento seleccionado?",
+                "Visualizar Mapa",
+                MessageBoxButtons.OKCancel,
+                MessageBoxIcon.Question
+            );
+
+            if (resultado == DialogResult.OK)
+            {
+                MessageBox.Show("Mapa abierto (simulado).", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
+
+        public string pedirAccionConEvento() => comboAccion.SelectedItem?.ToString();
+
+        public void tomarAccionConEvento()
+        {
+            string accion = pedirAccionConEvento();
+            gestor.tomarAccionConEvento(accion);
+            lblMensaje.Text = "‚úîÔ∏è Evento actualizado correctamente.";
+            lblMensaje.ForeColor = Color.FromArgb(39, 174, 96);
+            CargarEventos();
+            comboAccion.SelectedIndex = 0;
+            eventoSeleccionado = null;
+        }
+
+        // Handlers
+        private void btnSeleccionar_Click(object sender, EventArgs e) => tomarSeleccionEvento();
+        private void btnSeleccionar_Mapa(object sender, EventArgs e) => mostrarOpcionVisualizarMapa();
 
         private void btnRegistrar_Click(object sender, EventArgs e)
         {
             if (eventoSeleccionado == null)
             {
-                lblMensaje.Text = "Seleccion· un evento y mostr· detalles primero.";
-                lblMensaje.ForeColor = Color.IndianRed;
+                lblMensaje.Text = "Seleccion√° un evento y mostr√° detalles primero.";
+                lblMensaje.ForeColor = Color.FromArgb(192, 57, 43);
                 return;
             }
             if (string.IsNullOrEmpty(pedirAccionConEvento()))
             {
-                lblMensaje.Text = "Seleccion· una acciÛn.";
-                lblMensaje.ForeColor = Color.IndianRed;
+                lblMensaje.Text = "Seleccion√° una acci√≥n.";
+                lblMensaje.ForeColor = Color.FromArgb(192, 57, 43);
                 return;
             }
-            tomarAccionConEvento();
+            tomarAccionConEvento(); 
         }
+
 
         private void CargarEventos()
         {

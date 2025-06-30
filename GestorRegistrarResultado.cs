@@ -16,6 +16,15 @@ namespace RedSismicaWinForms
             this.sesion = sesion;
             eventosSismicosAutoDetectados = CrearEventosDePrueba();
         }
+        public List<EventoSismico> tomarRegistroResultadoRevisionManual()
+        {
+            // Inicializa variables de control del caso de usoo
+            eventoSeleccionado = null;
+
+            eventosSismicosAutoDetectados = obtenerEventosSismicosAutoDetectados();
+
+            return eventosSismicosAutoDetectados;
+        }
 
         public List<EventoSismico> obtenerEventosSismicosAutoDetectados()
         {
@@ -32,58 +41,50 @@ namespace RedSismicaWinForms
 
             return listaAutoDetectados;
         }
-        public void tomarSeleccionEvento(EventoSismico evento)
-        {
-            eventoSeleccionado = evento;
-            eventoSeleccionado.bloquearEventoSismico(usuarioLogueado);
-        }
 
-        public List<EventoSismico> buscarEstadoBloqueadoEnRevision(List<EventoSismico> lista)
-        {
-            var listadoBloqueadoEnRev = new List<EventoSismico>();
-            foreach (var evento in lista)
-            {
-                var estado = evento.obtenerEstadoActual();
-                if (estado.esAmbitoEventoSismico() && estado.esBloqueadoEnRevision())
-                {
-                    listadoBloqueadoEnRev.Add(evento);
-                }
-            }
-            return listadoBloqueadoEnRev;
-        }
-
-        public DateTime obtenerFechaHoraActual() => DateTime.Now;
-
-        //bloquearEventoSismico
-
-        //buscarMuestrasTemporales 
-
-        public void llamarCuGenerarSismograma() { }
-
-        public void tomarOpcionVisualizarMapa() { }
-
-        public void tomarRegistroResultadoRevisionManual()
-        {
-            // Inicializa variables de control del caso de usoo
-            eventoSeleccionado = null;
-
-            eventosSismicosAutoDetectados = obtenerEventosSismicosAutoDetectados();
-        }
-
-        
-
-        public Usuario obtenerUsuarioLogueado () => sesion.getUsuarioLogueado();
         public List<EventoSismico> ordenarPorFechaHora(List<EventoSismico> lista)
         {
             lista.Sort((a, b) => a.getFechaHoraOcurrencia().CompareTo(b.getFechaHoraOcurrencia()));
             return lista;
         }
 
+        public void tomarSeleccionEvento(EventoSismico evento)
+        {
+            buscarEstadoBloqueadoEnRevision(evento);
 
-        
+        }
 
+        public void buscarEstadoBloqueadoEnRevision(EventoSismico evento)
+        {
+            var estado = evento.obtenerEstadoActual();
+            
+                if (estado.esAmbitoEventoSismico() && estado.esBloqueadoEnRevision())
+                {
+                    var fechaHoraActual = obtenerFechaHoraActual();
+                    bloquearEventoSismico(evento, usuarioLogueado);
+                }
+            
+        }//IMPLEMENTAR
 
-        
+        public DateTime obtenerFechaHoraActual() => DateTime.Now;//IMPLEMENTAR
+
+        public string buscarDatosEventoSismico(EventoSismico evento)
+        {
+            return evento.getDatosEventoSismico();
+        }//IMPLEMENTAR
+
+        //buscarMuestrasSeriesTemporales 
+
+        public void bloquearEventoSismico (EventoSismico evento, Usuario usuario)
+        {
+            evento.bloquearEventoSismico(usuario);
+        }
+
+        public void llamarCuGenerarSismograma() { } 
+
+        public void tomarOpcionVisualizarMapa() { } 
+
+        public void tomarOpcionModificarEvSismico() { } //IMPLEMENTAR
 
         public void tomarAccionConEvento(string accion)
         {
@@ -102,13 +103,43 @@ namespace RedSismicaWinForms
                 eventoSeleccionado.setEstado("Derivado a Experto", usuarioLogueado);
             }
         }
-       
-        public string obtenerDatosEventoSismico(EventoSismico evento)
+
+        public void validarDatosEventoSismico() { } //IMPLEMENTAR
+
+        public void validarAccionConEvento() { } //loop IMPLEMENTAR}
+
+        //obtenerFechaHoraActual otra vez
+
+        public Usuario obtenerUsuarioLogueado() => sesion.getUsuarioLogueado();
+
+        public void rechazarEventoSismico(EventoSismico evento)
         {
-            return evento.getDatosEventoSismico();
+            if (evento == null) return;
+            evento.rechazar(usuarioLogueado);
+        }  //NO ESTA BIEN IMPLEMENTADO, REVISAR
+
+
+        public string buscarDatosEventoSismico(int indice)
+        {
+            if (indice < 0 || indice >= eventosSismicosAutoDetectados.Count)
+                return "";
+            return eventosSismicosAutoDetectados[indice].getDatosEventoSismico();
+        }
+        public List<string> buscarSeriesTemporales(int indice)
+        {
+            if (indice < 0 || indice >= eventosSismicosAutoDetectados.Count)
+                return new List<string>();
+            var evento = eventosSismicosAutoDetectados[indice];
+            return evento.getSerieTemporal()
+                         .Select(st => $"Estación: {st.obtenerCodigoEstacion()} | Sismógrafo: {st.obtenerNombreSismografo()}")
+                         .ToList();
         }
 
-        
+
+
+
+
+
 
         // Simulación de eventos auto detectados con datos de estación y sismógrafo
         private List<EventoSismico> CrearEventosDePrueba()

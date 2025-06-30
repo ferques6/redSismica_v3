@@ -18,5 +18,19 @@ namespace RedSismicaWinForms
         }
 
         public void setFechaHoraFin(DateTime fecha) { fechaHoraFin = fecha; }
+
+        public CambioEstado sosActual(List<CambioEstado> cambiosDeEstado)
+        {
+            foreach (var cambio in cambiosDeEstado)
+            {
+                if (cambio == cambiosDeEstado.Last())
+                {
+                    return cambio;
+                }
+                
+            }
+            return null;
+        }
+            
     }
 }

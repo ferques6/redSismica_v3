@@ -53,11 +53,12 @@ namespace RedSismicaWinForms
         public void agregarSerieTemporal(SerieTemporal st) => seriesTemporales.Add(st);
 
         // Cambio de estado
-        public CambioEstado buscarActualCE()
+        public CambioEstado buscarActualCE(List<CambioEstado> cambiosDeEstado)
         {
-            return cambiosDeEstado.LastOrDefault();
-        }
+            CambioEstado cambioActual = cambiosDeEstado.LastOrDefault();
 
+            return cambioActual;
+        }
         public void crearNuevoCambioEstado(Estado nuevoEstado, Usuario usuario)
         {
             if (cambiosDeEstado.Count > 0)
@@ -70,6 +71,7 @@ namespace RedSismicaWinForms
 
         public void setEstado(string descripcionNuevoEstado, Usuario usuario)
         {
+            CambioEstado actualCE = buscarActualCE(cambiosDeEstado);
             Estado nuevoEstado = new Estado(descripcionNuevoEstado);
             crearNuevoCambioEstado(nuevoEstado, usuario);
         }
@@ -79,6 +81,7 @@ namespace RedSismicaWinForms
         public void bloquearEventoSismico(Usuario usuario)
         {
             setEstado("Bloqueado en revisión", usuario);
+
         }
 
         public void rechazar(Usuario usuario)
@@ -115,11 +118,11 @@ namespace RedSismicaWinForms
 
         public string getDatosEventoSismico()
         {
-            return $"Fecha/Hora: {fechaHoraOcurrencia}\r\n" +
-                   $"Epicentro: Lat {latEpicentro}, Long {longEpicentro}, Prof {profEpicentro} km\r\n" +
-                   $"Hipocentro: Lat {latHipocentro}, Long {longHipocentro}, Prof {profHipocentro} km\r\n" +
-                   $"Magnitud: {magnitud}\r\n" +
-                   $"Estado actual: {estadoActual?.getDescripcion()}";
+            return $"Fecha/Hora: {getFechaHoraOcurrencia()}\r\n" +
+                   $" Epicentro: Lat {getLatitudEpicentro()}, Long {getLongitudEpicentro()}, Prof {profEpicentro} km\r\n" +
+                   $" Hipocentro: Lat {latHipocentro}, Long {getLongitudHipocentro()}, Prof {profHipocentro} km\r\n" +
+                   $" Magnitud: {getValorMagnitud()}\r\n" +
+                   $" Estado actual: {estadoActual?.getDescripcion()}";
         }
 
         public string buscarDatosEventosSismicos()
