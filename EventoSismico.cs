@@ -129,5 +129,11 @@ namespace RedSismicaWinForms
         {
             return getDatosEventoSismico();
         }
+
+        public void modificarDatos(string alcance, double magnitud, string origen)
+        {
+            
+        }
+
     }
 }

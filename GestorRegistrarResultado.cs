@@ -88,6 +88,8 @@ namespace RedSismicaWinForms
 
         public void tomarAccionConEvento(string accion)
         {
+            // if validarDatosEventoSismico 
+            // if validarAccionEvento
             if (eventoSeleccionado == null) return;
 
             if (accion == "Confirmar")
@@ -104,9 +106,28 @@ namespace RedSismicaWinForms
             }
         }
 
-        public void validarDatosEventoSismico() { } //IMPLEMENTAR
+        // En GestorRegistrarResultado.cs
 
-        public void validarAccionConEvento() { } //loop IMPLEMENTAR}
+        public bool validarDatosEventoSismico(int indice)
+        {
+            if (indice < 0 || indice >= eventosSismicosAutoDetectados.Count)
+                return false;
+
+            var evento = eventosSismicosAutoDetectados[indice];
+
+            // Valida que todos existan y no sean vacíos
+            bool tieneMagnitud = evento.getMagnitudRitcher() != null;
+            bool tieneAlcance = evento.getAlcance() != null;
+            bool tieneOrigen = evento.getOrigenDeGeneracion() != null;
+
+            return tieneMagnitud && tieneAlcance && tieneOrigen;
+        }
+
+        public bool validarAccionEvento(string accion)
+        {
+            return !string.IsNullOrWhiteSpace(accion);
+        }
+
 
         //obtenerFechaHoraActual otra vez
 
@@ -137,6 +158,13 @@ namespace RedSismicaWinForms
 
 
 
+        public void modificarDatosEvento(int indice, string alcance, double magnitud, string origen)
+        {
+            if (indice < 0 || indice >= eventosSismicosAutoDetectados.Count)
+                return;
+            var evento = eventosSismicosAutoDetectados[indice];
+            evento.modificarDatos(alcance, magnitud, origen);
+        }
 
 
 

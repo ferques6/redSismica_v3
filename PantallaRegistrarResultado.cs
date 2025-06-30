@@ -16,7 +16,7 @@ namespace RedSismicaWinForms
         private Label lblTitulo;
         private Label lblSubEventos, lblDetalles, lblSeries, lblAccion, lblMensaje;
         private ListBox listBoxEventos, listBoxSeries;
-        private Button btnSeleccionar, btnRegistrar, btnVisualizarMapa;
+        private Button btnSeleccionar, btnRegistrar, btnVisualizarMapa, btnModificarDatos;
         private TextBox txtDetalles;
         private ComboBox comboAccion;
 
@@ -122,6 +122,24 @@ namespace RedSismicaWinForms
             btnVisualizarMapa.FlatAppearance.BorderSize = 0;
             btnVisualizarMapa.Cursor = Cursors.Hand;
             btnVisualizarMapa.Click += btnSeleccionar_Mapa;
+
+            btnModificarDatos = new Button
+            {
+                Text = "Modificar datos del evento",
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                Left = 40,
+                Top = 470, // Debajo de Mapa
+                Width = 510,
+                Height = 40,
+                BackColor = Color.FromArgb(241, 196, 15),
+                ForeColor = Color.Black,
+                FlatStyle = FlatStyle.Flat,
+                Anchor = AnchorStyles.Left | AnchorStyles.Top
+            };
+            btnModificarDatos.FlatAppearance.BorderSize = 0;
+            btnModificarDatos.Cursor = Cursors.Hand;
+            btnModificarDatos.Click += btnModificarDatos_Click;
+            this.Controls.Add(btnModificarDatos);
 
             // Subtítulo detalles
             lblDetalles = new Label
@@ -281,6 +299,71 @@ namespace RedSismicaWinForms
             // Feedback
             lblMensaje.Top = altoVentana - 90;
             lblMensaje.Width = listBoxSeries.Width;
+        }
+        private void btnModificarDatos_Click(object sender, EventArgs e)
+        {
+            int indice = pedirSeleccionEvento();
+            if (indice < 0)
+            {
+                MessageBox.Show("Seleccioná un evento primero.", "Advertencia");
+                return;
+            }
+
+            // Obtengo los datos actuales del evento (usá métodos del gestor)
+            var evento = eventos[indice];
+            string alcanceActual = evento.getAlcance()?.ToString() ?? "";
+            string magnitudActual = evento.getValorMagnitud().ToString();
+            string origenActual = evento.getOrigenDeGeneracion()?.ToString() ?? "";
+
+            // Pido los nuevos datos (podrías usar un form custom, acá es simple)
+            string nuevoAlcance = Prompt.ShowDialog("Nuevo alcance:", "Modificar Alcance", alcanceActual);
+            if (nuevoAlcance == null) return;
+            string nuevaMagnitudStr = Prompt.ShowDialog("Nueva magnitud:", "Modificar Magnitud", magnitudActual);
+            if (nuevaMagnitudStr == null) return;
+            string nuevoOrigen = Prompt.ShowDialog("Nuevo origen:", "Modificar Origen", origenActual);
+            if (nuevoOrigen == null) return;
+
+            // Validaciones simples
+            if (!double.TryParse(nuevaMagnitudStr, out double nuevaMagnitud))
+            {
+                MessageBox.Show("La magnitud debe ser numérica.", "Error");
+                return;
+            }
+
+            // Llamo al gestor para modificar
+            gestor.modificarDatosEvento(indice, nuevoAlcance, nuevaMagnitud, nuevoOrigen);
+
+            MessageBox.Show("Datos modificados correctamente.", "Éxito");
+            mostrarDatosSismicos(indice); // Refrescá los datos en pantalla
+        }
+
+        // Clase utilitaria para InputBox (pegar en cualquier lado de tu proyecto)
+        public static class Prompt
+        {
+            public static string ShowDialog(string text, string caption, string defaultValue = "")
+            {
+                Form prompt = new Form()
+                {
+                    Width = 400,
+                    Height = 170,
+                    FormBorderStyle = FormBorderStyle.FixedDialog,
+                    Text = caption,
+                    StartPosition = FormStartPosition.CenterScreen
+                };
+                Label textLabel = new Label() { Left = 20, Top = 20, Text = text, Width = 340 };
+                TextBox textBox = new TextBox() { Left = 20, Top = 50, Width = 340, Text = defaultValue };
+                Button confirmation = new Button() { Text = "Aceptar", Left = 200, Width = 80, Top = 90, DialogResult = DialogResult.OK };
+                Button cancel = new Button() { Text = "Cancelar", Left = 280, Width = 80, Top = 90, DialogResult = DialogResult.Cancel };
+                confirmation.Click += (sender, e) => { prompt.Close(); };
+                cancel.Click += (sender, e) => { prompt.Close(); };
+                prompt.Controls.Add(textLabel);
+                prompt.Controls.Add(textBox);
+                prompt.Controls.Add(confirmation);
+                prompt.Controls.Add(cancel);
+                prompt.AcceptButton = confirmation;
+                prompt.CancelButton = cancel;
+                return prompt.ShowDialog() == DialogResult.OK ? textBox.Text : null;
+            }
         }
 
         // Métodos funcionales requeridos

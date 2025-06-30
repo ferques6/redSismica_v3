@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RedSismos_v3")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+072e16eaaad705348198e2560add18e151601aaf")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+484cdd07b386f64c3d30b4a4e573d484848bf53d")]
 [assembly: System.Reflection.AssemblyProductAttribute("RedSismos_v3")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RedSismos_v3")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
